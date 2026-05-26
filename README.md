@@ -15,7 +15,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 엔진 | Unity 3D, C# |
+| 엔진 | Unity 2022.3.62f2, C# |
 | 개발 기간 | 2026.04 – 05 |
 | 인원 | 1인 (기획·구조·구현) |
 | 플랫폼 | PC / Android |
@@ -63,38 +63,18 @@ CustomerController 수프 소비
 
 ```
 Assets/Scripts/
-├── Audio/              # AudioManager, Sfx, SoundData, SoundId
-├── Camera/             # CameraFollow
-├── CookingArea/        # CookingMachineController
-├── Core/               # GameClearController, MoneyManager
-├── Customer/           # CustomerController, CustomerQueueManager
-├── FieldArea/
-│   ├── Hire/           # FarmerHireController
-│   ├── Worker/         # FarmerWorker, FarmerGroupController, FarmerSpawnController
-│   └── World/          # CarrotNode
-├── Interface/          # IPickupSource, IItemDepositTarget, IMoneyDepositTarget, SaleDeskDepositAdapter
-├── Item/               # ItemStack, ItemVisualEffectPool, MoneyFlyController
-├── Pen/
-│   ├── Animals/        # AnimalController
-│   ├── PenProductBox/  # PenCollectionBox
-│   ├── PenSlot/        # PenSlotController
-│   └── PenUpgrade/     # PenUpgradeController
 ├── Player/
-│   ├── Action/         # PlayerZoneActionHandler, PlayerZoneDetector, PlayerFarmer
-│   ├── Animation/      # PlayerAnimationController
-│   ├── FarmingTools/   # PlayerFarmingToolController, ToolUpgradeController
-│   ├── Input/          # PlayerInputReader
-│   ├── Inventory/      # PlayerInventory, PlayerStackController
-│   └── Movement/       # Controllable, InputDispatcher, PlayerMovement, VehicleMountController, VehicleMovement
-├── SaleArea/
-│   ├── Desk/           # SaleDeskController
-│   ├── Hire/           # CourierHireController
-│   └── Worker/         # CourierWorker, WorkerStackController
-├── UI/                 # PlayerUIController, GameEndUIController, TutorialController
-└── Zone/
-    ├── Core/           # Zone, ZoneType, ZoneRevealDirector
-    ├── Trigger/        # ToolUpgradeRevealTrigger, UpgradeStepTransitionTrigger
-    └── View/           # ZoneCostVisual, ZoneHighlightView
+│   ├── Action/         # PlayerZoneActionHandler, PlayerZoneDetector
+│   ├── Movement/       # Controllable, InputDispatcher, PlayerMovement, VehicleMountController, VehicleMovement
+│   └── Inventory/      # PlayerInventory, PlayerStackController
+├── FieldArea/          # FarmerWorker, CarrotNode
+├── Pen/                # AnimalController, PenCollectionBox
+├── SaleArea/           # SaleDeskController, CourierWorker
+├── Item/               # ItemStack, ItemVisualEffectPool
+├── Interface/          # IPickupSource, IItemDepositTarget, IMoneyDepositTarget
+├── Zone/               # ZoneRevealDirector, ZoneType
+├── Core/               # MoneyManager
+└── UI/
 ```
 
 ---
@@ -140,16 +120,7 @@ IMoneyDepositTarget
 `CourierWorker` NPC도 `IPickupSource.TryTakeItem()`을 통해서만 `CookingMachineController`에 접근합니다.   
 플레이어·NPC가 동일한 인터페이스로 픽업을 처리해 호출부 일관성을 유지합니다.
 
-```csharp
-// SaleDeskDepositAdapter.cs
-public bool CanAddItem(int amount = 1) => type == TargetType.Soup
-    ? desk.CanAddSoup(amount)
-    : desk.CanAddMilk(amount);
-
-public bool TryAddItem(int amount = 1) => type == TargetType.Soup
-    ? desk.TryAddSoup(amount)
-    : desk.TryAddMilk(amount);
-```
+→ [`Interface/`](Assets/Scripts/Interface/)
 
 ---
 
@@ -176,12 +147,7 @@ Claim된 당근은 다른 FarmerWorker의 탐색에서 제외되어 동시 타�
 수확 직후 즉시 같은 자리에서 다음 당근을 잡는 현상을 방지합니다.    
 `postHarvestAdvanceDistance`만큼 짧게 강제 전진 후 다시 탐색합니다.
 
-```csharp
-// FarmerWorker.cs — TryAcquireForwardCarrot (핵심 발췌)
-float dot = Vector3.Dot(transform.forward, toCarrot.normalized);
-if (dot < forwardDotThreshold) continue;          // 후방·측면 당근 제외
-if (!candidate.TryClaim(this)) continue;           // 선점 실패 시 제외
-```
+→ [`FieldArea/Worker/FarmerWorker.cs`](Assets/Scripts/FieldArea/Worker/FarmerWorker.cs)
 
 ---
 
@@ -216,14 +182,7 @@ PlayMoveAnimation() → Get() → MoveRoutine(Coroutine)
 연출 완료 후 `onArrived` 콜백으로 실제 데이터를 반영합니다.    
 연출 중 데이터가 먼저 반영되면 비주얼과 수치가 어긋나는 문제를 방지합니다.
 
-```csharp
-// ItemVisualEffectPool.cs — MoveRoutine (핵심 발췌)
-float arc = Mathf.Sin(t * Mathf.PI) * arcHeight;
-obj.transform.position = Vector3.Lerp(start, target, t) + Vector3.up * arc;
-// ...
-Return(obj);
-onArrived?.Invoke();  // 연출 완료 후 데이터 반영
-```
+→ [`Item/ItemStack.cs`](Assets/Scripts/Item/ItemStack.cs) · [`Item/ItemVisualEffectPool.cs`](Assets/Scripts/Item/ItemVisualEffectPool.cs)
 
 ---
 
@@ -253,6 +212,8 @@ TryPickupItem / TryDepositItem / HandleMoneyDeposit
 **설계 결정 — 타이머 리셋:**  
 존이 바뀔 때 공통 타이머를 리셋합니다. 존 전환 직후 첫 액션이 즉시 실행되지 않아 인터벌이 일관되게 유지됩니다.
 
+→ [`Player/Action/PlayerZoneActionHandler.cs`](Assets/Scripts/Player/Action/PlayerZoneActionHandler.cs)
+
 ---
 
 ### 5. Vehicle 탑승 시스템 — Controllable 추상화
@@ -272,6 +233,8 @@ InputDispatcher.SetTarget(Controllable) → 런타임 입력 대상 교체
 
 새 이동 수단 추가 시 `Controllable`을 상속하는 것만으로 확장됩니다.
 
+→ [`Player/Movement/`](Assets/Scripts/Player/Movement/)
+
 ---
 
 ### 6. ZoneRevealDirector — 카메라 연출
@@ -289,6 +252,17 @@ PlayReveal()
 ```
 
 중복 실행 방지를 위해 `isPlaying` 플래그를 사용합니다. 포커스 전용 연출(`PlayFocusOnlyRoutine`)도 외부에서 `yield return`으로 대기할 수 있도록 별도로 제공합니다.
+
+→ [`Zone/Core/ZoneRevealDirector.cs`](Assets/Scripts/Zone/Core/ZoneRevealDirector.cs)
+
+---
+
+<br>
+
+## 링크
+
+YouTube 게임 소개 영상
+https://youtu.be/TWybSNSr_Ho
 
 ---
 
