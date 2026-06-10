@@ -13,7 +13,7 @@ public class ToolUpgradeController : MonoBehaviour, IMoneyDepositTarget
 {
     [Header("References")]
     [SerializeField] private PlayerFarmingToolController farmingToolController;
-    [SerializeField] private PlayerInventory playerInventory;         // 추가
+    [SerializeField] private PlayerInventory playerInventory;        
     [SerializeField] private UpgradeStepTransitionTrigger transitionTrigger;
     [SerializeField] private ZoneCostVisual zoneCostVisual;
 
@@ -76,7 +76,6 @@ public class ToolUpgradeController : MonoBehaviour, IMoneyDepositTarget
         // 인벤토리 용량 확장 (설정된 경우에만)
         if (playerInventory != null && expandedInventoryCapacity > 0)
         {
-            Debug.Log($"[ToolUpgrade] ExpandCapacity 호출 — targetTier: {targetTier}, expandedInventoryCapacity: {expandedInventoryCapacity}");
             playerInventory.ExpandCapacity(expandedInventoryCapacity);
         }
         else

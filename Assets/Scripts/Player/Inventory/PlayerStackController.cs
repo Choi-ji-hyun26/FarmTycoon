@@ -44,7 +44,6 @@ public class PlayerStackController : MonoBehaviour
     public void ExpandStackCapacity(int newMax)
     {
         if (newMax <= maxVisualStack) return;
-        Debug.Log("ExpandStackCapacity 실행 : " + newMax);
         maxVisualStack = newMax;
         soupStack.SetMaxCount(newMax);
         milkStack.SetMaxCount(newMax);
@@ -55,7 +54,6 @@ public class PlayerStackController : MonoBehaviour
     {
         for (int i = 0; i < amount; i++)
         {
-            Debug.Log($"AddCarrotStack — carrotStacks.Count: {carrotStacks.Count}, maxVisualStack: {maxVisualStack}");
             if (carrotStacks.Count >= maxVisualStack) return;
 
             GameObject stackObj = GetFromPool(carrotPool, carrotStackPrefab);
@@ -108,7 +106,7 @@ public class PlayerStackController : MonoBehaviour
             return obj;
         }
         GameObject newObj = CreatePoolObject(prefab);
-        newObj.SetActive(true); // 추가
+        newObj.SetActive(true); 
         return newObj;
     }
 

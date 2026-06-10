@@ -55,8 +55,7 @@ public class SaleDeskController : MonoBehaviour
         targetCustomer = customer;
     }
 
-    // 손님에게 아이템 제공, 수프 우선, 없으면 우유
-    // 수감자에게 수갑 1개씩 공급, 감옥 만석 or 대상 상태 맞지 않으면 공급 중단    
+    // 손님에게 아이템 제공, 수프 우선, 없으면 우유 제공
     private void TrySupplyCustomer()
     {
         if(targetCustomer == null) return;

@@ -21,9 +21,6 @@ public class GameClearController : MonoBehaviour
 
     private bool hasTriggered;
 
-    // 게임 클리어 조건 달성 시 외부에서 호출
-    // 2번째 우리 확장 완료 시점에서 PenExpansionController가 호출
-
     public void TriggerGameClear()
     {
         if(hasTriggered) return;

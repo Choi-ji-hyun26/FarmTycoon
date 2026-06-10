@@ -99,7 +99,7 @@ public class TutorialController : MonoBehaviour
         bool conditionMet = currentStep switch
         {
             TutorialStep.HarvestCarrot  => inventory.CarrotCount >= 1,
-            TutorialStep.DeliverCarrot  => cookingMachineController.StoredCarrotCount >= 1,//inventory.CarrotCount == 0 && inventory.SoupCount == 0,
+            TutorialStep.DeliverCarrot  => cookingMachineController.StoredCarrotCount >= 1,
             TutorialStep.DeliverSoup    => CheckSoupDelivered(),
             _ => false
         };
