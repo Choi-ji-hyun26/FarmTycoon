@@ -95,6 +95,8 @@ public class ToolUpgradeController : MonoBehaviour, IMoneyDepositTarget
         {
             transitionTrigger.TriggerTransition();
         }
+
+        UpgradeCompletionTracker.Instance?.NotifyUpgradeCompleted();
     }
 
     private void RefreshVisual()

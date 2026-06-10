@@ -10,5 +10,6 @@ public enum ZoneType
     ToolUpgrade,
     FarmerHire,
     PenUpgrade,
+    PenFinalUpgrade,
     SoupCourierHire
 }

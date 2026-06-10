@@ -77,6 +77,8 @@ public class CourierHireController : MonoBehaviour, IMoneyDepositTarget
         {
             transitionTrigger.TriggerTransition();
         }
+
+        UpgradeCompletionTracker.Instance?.NotifyUpgradeCompleted();
     }
 
     private void RefreshVisual()

@@ -117,7 +117,12 @@ public class PlayerZoneActionHandler : MonoBehaviour
 
             case ZoneType.PenUpgrade:
                 HandleMoneyDeposit(
-                    zone.GetComponentInParent<PenUpgradeController>());
+                    zone.GetComponentInParent<PenExpansionController>());
+                break;
+
+            case ZoneType.PenFinalUpgrade:
+                HandleMoneyDeposit(
+                    zone.GetComponentInParent<PenFinalExpansionController>());
                 break;
         }
     }
