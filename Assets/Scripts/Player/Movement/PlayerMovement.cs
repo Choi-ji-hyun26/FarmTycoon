@@ -8,13 +8,8 @@ public class PlayerMovement : Controllable
     [SerializeField] private float moveSpeed = 4.5f;
     [SerializeField] private float rotationSpeed = 12f;
 
-    [Header("Ground Check")]
-    [SerializeField] private float groundCheckDistance = 0.2f;
-    [SerializeField] private LayerMask groundLayer;
-
     private Rigidbody rb;
     private float currentSpeed;
-    //private bool isGrounded;
 
     public float CurrentSpeed => currentSpeed;
 
@@ -30,21 +25,10 @@ public class PlayerMovement : Controllable
     private void FixedUpdate()
     {
         if (!enabled) return;
-        //CheckGround();
         Vector2 input = inputReader.MoveInput;
         Move(input);
         Rotate(input);
     }
-
-    // private void CheckGround()
-    // {
-    //     isGrounded = Physics.Raycast(
-    //         transform.position,
-    //         Vector3.down,
-    //         groundCheckDistance + 0.1f,
-    //         groundLayer
-    //     );
-    // }
 
     public override void Move(Vector2 input)
     {

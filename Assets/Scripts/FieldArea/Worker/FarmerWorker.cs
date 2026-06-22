@@ -163,7 +163,7 @@ public class FarmerWorker : MonoBehaviour
 
         harvestTimer = 0f;
         PlayHarvestAnimation();
-        ExecuteHarvest();
+        HandleHarvest();
     }
 
     // 복귀 상태 : 시작점까지 이동하며 복귀 중에는 수확하지 않음
@@ -374,16 +374,12 @@ public class FarmerWorker : MonoBehaviour
 
     // 실제 수확 판정을 수행
     // 데미지 적용, 사운드 재생, 당근 파괴 시 보상 지급과 상태 전환을 담당
-    private void ExecuteHarvest()
+    private void HandleHarvest()
     {
         if (!IsValidTarget(currentTarget))
             return;
 
-        Vector3 hitPoint = currentTargetCollider != null
-            ? currentTargetCollider.ClosestPoint(transform.position)
-            : currentTarget.transform.position;
-
-        bool destroyedThisHit = currentTarget.Harvest(hitDamage, hitPoint);
+        bool destroyedThisHit = currentTarget.TakeHit(hitDamage);
 
         // 1타당 1회 사운드 재생
         Sfx.PlayAtPoint(SoundId.Harvest, transform.position);

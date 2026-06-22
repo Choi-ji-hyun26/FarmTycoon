@@ -78,10 +78,6 @@ public class ToolUpgradeController : MonoBehaviour, IMoneyDepositTarget
         {
             playerInventory.ExpandCapacity(expandedInventoryCapacity);
         }
-        else
-        {
-            Debug.LogWarning($"[ToolUpgrade] ExpandCapacity 미호출 — playerInventory: {playerInventory}, expandedInventoryCapacity: {expandedInventoryCapacity}");
-        }
 
         if (zoneCostVisual != null)
         {

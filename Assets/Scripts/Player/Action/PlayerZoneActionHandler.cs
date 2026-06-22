@@ -24,6 +24,12 @@ public class PlayerZoneActionHandler : MonoBehaviour
     [SerializeField] private PenCollectionBox penCollectionBox;
     [SerializeField] private ToolUpgradeRevealTrigger toolUpgradeRevealTrigger;
 
+    [Header("Upgrade Controllers")]
+    [SerializeField] private FarmerHireController farmerHire;
+    [SerializeField] private CourierHireController soupCourierHire;
+    [SerializeField] private PenExpansionController penUpgrade;
+    [SerializeField] private PenFinalExpansionController penFinalUpgrade;
+
     [Header("Money Pickup")]
     [SerializeField] private int moneyValuePerPickup = 10;
     [SerializeField] private int moneyValuePerDeposit = 10;
@@ -101,28 +107,23 @@ public class PlayerZoneActionHandler : MonoBehaviour
                 break;
 
             case ZoneType.ToolUpgrade:
-                HandleMoneyDeposit(
-                    zone.GetComponentInParent<ToolUpgradeController>());
+                HandleMoneyDeposit(zone.GetComponentInParent<ToolUpgradeController>());
                 break;
 
             case ZoneType.FarmerHire:
-                HandleMoneyDeposit(
-                    zone.GetComponentInParent<FarmerHireController>());
+                HandleMoneyDeposit(farmerHire);
                 break;
 
             case ZoneType.SoupCourierHire:
-                HandleMoneyDeposit(
-                    zone.GetComponentInParent<CourierHireController>());
+                HandleMoneyDeposit(soupCourierHire);
                 break;
 
             case ZoneType.PenUpgrade:
-                HandleMoneyDeposit(
-                    zone.GetComponentInParent<PenExpansionController>());
+                HandleMoneyDeposit(penUpgrade);
                 break;
 
             case ZoneType.PenFinalUpgrade:
-                HandleMoneyDeposit(
-                    zone.GetComponentInParent<PenFinalExpansionController>());
+                HandleMoneyDeposit(penFinalUpgrade);
                 break;
         }
     }
