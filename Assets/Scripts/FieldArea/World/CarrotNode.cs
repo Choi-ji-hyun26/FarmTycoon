@@ -74,7 +74,7 @@ public class CarrotNode : MonoBehaviour
 
     // 수확 데미지를 적용
     // HP가 0 이하면 당근을 파괴하고 true를 반환
-    public bool Harvest(int damage, Vector3 hitPoint)
+    public bool TakeHit(int damage)
     {
         if (isDepleted)
             return false;

@@ -84,7 +84,7 @@ public class PlayerFarmer : MonoBehaviour
         for (int i = 0; i < harvestCount; i++)
         {
             CarrotCandidate candidate = candidateCarrots[i];
-            bool destroyedThisHit = candidate.carrot.Harvest(hitDamage, candidate.point);
+            bool destroyedThisHit = candidate.carrot.TakeHit(hitDamage);
 
             if (!destroyedThisHit)
                 continue;
