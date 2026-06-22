@@ -5632,6 +5632,10 @@ MonoBehaviour:
   saleDeskController: {fileID: 1190000161}
   penCollectionBox: {fileID: 1320493680}
   toolUpgradeRevealTrigger: {fileID: 1607803118}
+  farmerHire: {fileID: 551439631}
+  soupCourierHire: {fileID: 1921854364}
+  penUpgrade: {fileID: 672652697}
+  penFinalUpgrade: {fileID: 1723839996}
   moneyValuePerPickup: 10
   moneyValuePerDeposit: 10
   moneyFlyController: {fileID: 1114319112}
