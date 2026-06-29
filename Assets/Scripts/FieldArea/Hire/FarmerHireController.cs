@@ -69,7 +69,7 @@ public class FarmerHireController : MonoBehaviour, IMoneyDepositTarget
             farmerGroupController.ActivateFarmers();
         }
 
-        EventBus<FarmerHiredEvent>.Publish(new FarmerHiredEvent());
+        EventBus.Publish(new FarmerHiredEvent());
 
         if (zoneCostVisual != null)
         {

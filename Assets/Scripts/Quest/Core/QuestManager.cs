@@ -84,7 +84,6 @@ public class QuestManager : IStartable, System.IDisposable
 
         if (_currentQuest.State == QuestState.Claimable)
         {
-            // Claimable은 별도 이벤트로 분리 — OnQuestChanged 발행 안 함
             OnQuestClaimable?.Invoke(_currentQuest);
         }
         else if (_currentQuest.State == QuestState.Completed)
@@ -105,31 +104,31 @@ public class QuestManager : IStartable, System.IDisposable
         switch (_currentQuest.Data.TargetEvent)
         {
             case QuestEventType.CarrotHarvested:
-                EventBus<CarrotHarvestedEvent>.Subscribe(_currentQuest.OnCarrotHarvested);
+                EventBus.Subscribe<CarrotHarvestedEvent>(_currentQuest.OnCarrotHarvested);
                 break;
             case QuestEventType.SoupProduced:
-                EventBus<SoupProducedEvent>.Subscribe(_currentQuest.OnSoupProduced);
+                EventBus.Subscribe<SoupProducedEvent>(_currentQuest.OnSoupProduced);
                 break;
             case QuestEventType.SoupSold:
-                EventBus<SoupSoldEvent>.Subscribe(_currentQuest.OnSoupSold);
+                EventBus.Subscribe<SoupSoldEvent>(_currentQuest.OnSoupSold);
                 break;
             case QuestEventType.MilkSold:
-                EventBus<MilkSoldEvent>.Subscribe(_currentQuest.OnMilkSold);
+                EventBus.Subscribe<MilkSoldEvent>(_currentQuest.OnMilkSold);
                 break;
             case QuestEventType.CustomerServed:
-                EventBus<CustomerServedEvent>.Subscribe(_currentQuest.OnCustomerServed);
+                EventBus.Subscribe<CustomerServedEvent>(_currentQuest.OnCustomerServed);
                 break;
             case QuestEventType.ToolUpgraded:
-                EventBus<ToolUpgradedEvent>.Subscribe(_currentQuest.OnToolUpgraded);
+                EventBus.Subscribe<ToolUpgradedEvent>(_currentQuest.OnToolUpgraded);
                 break;
             case QuestEventType.FarmerHired:
-                EventBus<FarmerHiredEvent>.Subscribe(_currentQuest.OnFarmerHired);
+                EventBus.Subscribe<FarmerHiredEvent>(_currentQuest.OnFarmerHired);
                 break;
             case QuestEventType.CourierHired:
-                EventBus<CourierHiredEvent>.Subscribe(_currentQuest.OnCourierHired);
+                EventBus.Subscribe<CourierHiredEvent>(_currentQuest.OnCourierHired);
                 break;
             case QuestEventType.PenExpanded:
-                EventBus<PenExpandedEvent>.Subscribe(_currentQuest.OnPenExpanded);
+                EventBus.Subscribe<PenExpandedEvent>(_currentQuest.OnPenExpanded);
                 break;
         }
     }
@@ -144,31 +143,31 @@ public class QuestManager : IStartable, System.IDisposable
         switch (_currentQuest.Data.TargetEvent)
         {
             case QuestEventType.CarrotHarvested:
-                EventBus<CarrotHarvestedEvent>.Unsubscribe(_currentQuest.OnCarrotHarvested);
+                EventBus.Unsubscribe<CarrotHarvestedEvent>(_currentQuest.OnCarrotHarvested);
                 break;
             case QuestEventType.SoupProduced:
-                EventBus<SoupProducedEvent>.Unsubscribe(_currentQuest.OnSoupProduced);
+                EventBus.Unsubscribe<SoupProducedEvent>(_currentQuest.OnSoupProduced);
                 break;
             case QuestEventType.SoupSold:
-                EventBus<SoupSoldEvent>.Unsubscribe(_currentQuest.OnSoupSold);
+                EventBus.Unsubscribe<SoupSoldEvent>(_currentQuest.OnSoupSold);
                 break;
             case QuestEventType.MilkSold:
-                EventBus<MilkSoldEvent>.Unsubscribe(_currentQuest.OnMilkSold);
+                EventBus.Unsubscribe<MilkSoldEvent>(_currentQuest.OnMilkSold);
                 break;
             case QuestEventType.CustomerServed:
-                EventBus<CustomerServedEvent>.Unsubscribe(_currentQuest.OnCustomerServed);
+                EventBus.Unsubscribe<CustomerServedEvent>(_currentQuest.OnCustomerServed);
                 break;
             case QuestEventType.ToolUpgraded:
-                EventBus<ToolUpgradedEvent>.Unsubscribe(_currentQuest.OnToolUpgraded);
+                EventBus.Unsubscribe<ToolUpgradedEvent>(_currentQuest.OnToolUpgraded);
                 break;
             case QuestEventType.FarmerHired:
-                EventBus<FarmerHiredEvent>.Unsubscribe(_currentQuest.OnFarmerHired);
+                EventBus.Unsubscribe<FarmerHiredEvent>(_currentQuest.OnFarmerHired);
                 break;
             case QuestEventType.CourierHired:
-                EventBus<CourierHiredEvent>.Unsubscribe(_currentQuest.OnCourierHired);
+                EventBus.Unsubscribe<CourierHiredEvent>(_currentQuest.OnCourierHired);
                 break;
             case QuestEventType.PenExpanded:
-                EventBus<PenExpandedEvent>.Unsubscribe(_currentQuest.OnPenExpanded);
+                EventBus.Unsubscribe<PenExpandedEvent>(_currentQuest.OnPenExpanded);
                 break;
         }
     }

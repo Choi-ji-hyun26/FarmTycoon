@@ -41,7 +41,7 @@ public class PlayerInventory : MonoBehaviour
 
         CarrotCount += amount;
         stackController?.AddCarrotStack(amount);
-        EventBus<CarrotHarvestedEvent>.Publish(new CarrotHarvestedEvent { count = amount });
+        EventBus.Publish(new CarrotHarvestedEvent { count = amount });
         return true;
     }
 

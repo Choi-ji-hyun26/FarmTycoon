@@ -59,7 +59,7 @@ public class PenExpansionController : MonoBehaviour, IMoneyDepositTarget
 
         penSlotController.UnlockSlots(slotCountToUnlock);
 
-        EventBus<PenExpandedEvent>.Publish(new PenExpandedEvent());
+        EventBus.Publish(new PenExpandedEvent());
 
         if (penCollectionBox != null && expandedMilkCapacity > 0)
             penCollectionBox.ExpandCapacity(expandedMilkCapacity);

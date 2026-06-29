@@ -35,6 +35,6 @@ public class CustomerServedCounter : MonoBehaviour
     {
         totalServedCount++;
         OnServedCountChanged?.Invoke(totalServedCount);
-        EventBus<CustomerServedEvent>.Publish(new CustomerServedEvent { totalCount = totalServedCount });
+        EventBus.Publish(new CustomerServedEvent { totalCount = totalServedCount });
     }
 }

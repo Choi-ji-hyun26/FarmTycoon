@@ -73,7 +73,7 @@ public class ToolUpgradeController : MonoBehaviour, IMoneyDepositTarget
         if (farmingToolController != null)
             farmingToolController.UnlockTier(targetTier);
 
-        EventBus<ToolUpgradedEvent>.Publish(new ToolUpgradedEvent());
+        EventBus.Publish(new ToolUpgradedEvent());
 
         // 인벤토리 용량 확장 (설정된 경우에만)
         if (playerInventory != null && expandedInventoryCapacity > 0)

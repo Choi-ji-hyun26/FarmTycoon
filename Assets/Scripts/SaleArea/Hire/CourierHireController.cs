@@ -66,7 +66,7 @@ public class CourierHireController : MonoBehaviour, IMoneyDepositTarget
             courierWorker.ActivateWorker();
         }
 
-        EventBus<CourierHiredEvent>.Publish(new CourierHiredEvent());
+        EventBus.Publish(new CourierHiredEvent());
 
         if (zoneCostVisual != null)
         {

@@ -72,7 +72,7 @@ public class SaleDeskController : MonoBehaviour
                 if(soupStack.TryConsume(1))
                 {
                     targetCustomer.TryReceiveProduct(1);
-                    EventBus<SoupSoldEvent>.Publish(new SoupSoldEvent { count = 1 });
+                    EventBus.Publish(new SoupSoldEvent { count = 1 });
                 }
         }
         else if (targetCustomer.RequestType == CustomerRequestType.Milk)
@@ -81,7 +81,7 @@ public class SaleDeskController : MonoBehaviour
                 if (milkStack.TryConsume(1))
                 {
                     targetCustomer.TryReceiveProduct(1);
-                    EventBus<MilkSoldEvent>.Publish(new MilkSoldEvent { count = 1 });
+                    EventBus.Publish(new MilkSoldEvent { count = 1 });
                 }
         }
     }
