@@ -20,21 +20,10 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterInstance(questDataList);
         builder.RegisterComponent(expManager);
         builder.RegisterComponent(questUIController);
+        builder.RegisterComponent(questArrowDirector);
 
         builder.Register<QuestManager>(Lifetime.Singleton)
                .AsImplementedInterfaces()
                .AsSelf();
-    }
-
-    protected override void Awake()
-    {
-        base.Awake();
-
-        // Container 빌드 완료 후 QuestArrowDirector 초기화
-        // QuestManager.Start()보다 먼저 Initialize 등록해야
-        // 첫 OnQuestChanged 이벤트를 놓치지 않음
-        var questManager = Container.Resolve<QuestManager>();
-        if (questArrowDirector != null)
-            questArrowDirector.Initialize(questManager);
     }
 }

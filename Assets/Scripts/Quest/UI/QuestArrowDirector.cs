@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using DG.Tweening;
+using VContainer;
 
 /// <summary>
 /// 퀘스트 진행 방향 화살표 연출
@@ -18,6 +19,14 @@ public class QuestArrowDirector : MonoBehaviour
     private Tween _bobTween;
     private Coroutine _retryCoroutine;
 
+    [Inject]
+    public void Construct(QuestManager questManager)
+    {
+        _questManager = questManager;
+        _questManager.OnQuestChanged += OnQuestChanged;
+        _questManager.OnProgressChanged += OnProgressChanged;
+    }
+
     private void OnDestroy()
     {
         _bobTween?.Kill();
@@ -28,13 +37,6 @@ public class QuestArrowDirector : MonoBehaviour
             _questManager.OnQuestChanged -= OnQuestChanged;
             _questManager.OnProgressChanged -= OnProgressChanged;
         }
-    }
-
-    public void Initialize(QuestManager questManager)
-    {
-        _questManager = questManager;
-        _questManager.OnQuestChanged += OnQuestChanged;
-        _questManager.OnProgressChanged += OnProgressChanged;
     }
 
     private void Start()
