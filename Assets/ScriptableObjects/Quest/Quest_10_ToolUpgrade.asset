@@ -16,5 +16,7 @@ MonoBehaviour:
   title: "\uB3C4\uAD6C \uC5C5\uADF8\uB808\uC774\uB4DC"
   targetEvent: 5
   targetValue: 1
+  targetToolTier: 3
+  targetPenStage: 0
   reward: {fileID: 11400000, guid: af07b68482291497ca881f2156abe91f, type: 2}
   arrowTargetId: 

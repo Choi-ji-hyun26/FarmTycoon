@@ -13,6 +13,7 @@ public class QuestManager : IStartable, System.IDisposable
 {
     private readonly List<QuestData> _questDataList;
     private readonly QuestProgressTracker _progressTracker;
+    private readonly IRewardContext _rewardContext;
 
     private QuestInstance _currentQuest;
     private int _currentIndex = -1;
@@ -30,10 +31,11 @@ public class QuestManager : IStartable, System.IDisposable
     public event System.Action<QuestInstance> OnProgressChanged;
 
     [Inject]
-    public QuestManager(List<QuestData> questDataList, QuestProgressTracker progressTracker)
+    public QuestManager(List<QuestData> questDataList, QuestProgressTracker progressTracker, ExpManager expManager)
     {
         _questDataList = questDataList;
         _progressTracker = progressTracker;
+        _rewardContext = new RewardContext(expManager);
     }
 
     // QuestProgressTracker.Start()가 먼저 실행되도록
@@ -76,7 +78,7 @@ public class QuestManager : IStartable, System.IDisposable
         if (_currentQuest == null) return;
         if (_currentQuest.State != QuestState.Claimable) return;
 
-        _currentQuest.Claim();
+        _currentQuest.Claim(_rewardContext);
     }
 
     private void OnCurrentQuestStateChanged()

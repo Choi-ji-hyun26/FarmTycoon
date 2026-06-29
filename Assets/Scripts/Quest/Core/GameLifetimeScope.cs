@@ -14,6 +14,7 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private ExpManager expManager;
     [SerializeField] private QuestUIController questUIController;
     [SerializeField] private QuestArrowDirector questArrowDirector;
+    [SerializeField] private LevelUIController levelUIController;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -21,6 +22,7 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponent(expManager);
         builder.RegisterComponent(questUIController);
         builder.RegisterComponent(questArrowDirector);
+        builder.RegisterComponent(levelUIController);
 
         // QuestProgressTracker를 먼저 등록 — IStartable 실행 순서상 우선
         builder.Register<QuestProgressTracker>(Lifetime.Singleton)

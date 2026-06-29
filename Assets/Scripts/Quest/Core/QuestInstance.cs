@@ -52,11 +52,11 @@ public class QuestInstance
     }
 
     // 플레이어가 패널 클릭 시 호출
-    public void Claim()
+    public void Claim(IRewardContext rewardContext)
     {
         if (State != QuestState.Claimable) return;
 
-        Data.Reward?.Grant();
+        Data.Reward?.Grant(rewardContext);
         State = QuestState.Completed;
         OnStateChanged?.Invoke();
     }

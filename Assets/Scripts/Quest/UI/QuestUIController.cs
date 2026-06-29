@@ -23,17 +23,22 @@ public class QuestUIController : MonoBehaviour
     [Header("Complete")]
     [SerializeField] private GameObject checkMarkImage;
 
+    [Header("Exp Effect")]
+    [SerializeField] private RectTransform expEffectOrigin; // EXP 텍스트 시작 위치 (패널)
+
     [Header("DOTween Settings")]
     [SerializeField] private float claimScaleDuration = 0.2f;
     [SerializeField] private float shakeStrength = 10f;
     [SerializeField] private float shakeDuration = 0.3f;
 
     private QuestManager _questManager;
+    private LevelUIController _levelUIController;
 
     [Inject]
-    public void Construct(QuestManager questManager)
+    public void Construct(QuestManager questManager, LevelUIController levelUIController)
     {
         _questManager = questManager;
+        _levelUIController = levelUIController;
     }
 
     private void Start()
@@ -105,10 +110,21 @@ public class QuestUIController : MonoBehaviour
         if (_questManager.CurrentQuest == null) return;
         if (_questManager.CurrentQuest.State != QuestState.Claimable) return;
 
+        // 보상 금액을 클릭 시점에 확보 (Claim 후 퀘스트가 전환되므로)
+        int expAmount = 0;
+        if (_questManager.CurrentQuest.Data.Reward is ExpReward expReward)
+            expAmount = expReward.ExpAmount;
+
         PlayClaimAnimation(() =>
         {
             checkMarkImage.SetActive(false);
+
+            // 데이터 먼저 갱신 (ExpManager.AddExp)
             _questManager.ClaimCurrentQuest();
+
+            // 그 다음 EXP 이동 연출 시작
+            if (expAmount > 0)
+                _levelUIController.PlayExpGainEffect(expEffectOrigin, expAmount);
         });
     }
 
