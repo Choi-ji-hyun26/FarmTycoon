@@ -17,11 +17,11 @@ public class QuestUIController : MonoBehaviour
 
     [Header("Info")]
     [SerializeField] private TMP_Text titleText;
-    [SerializeField] private TMP_Text progressText;   // "4 / 5"
-    [SerializeField] private Slider progressBar;
+    [SerializeField] private TMP_Text progressText;
+    [SerializeField] private TMP_Text expRewardText;
 
-    [Header("Reward")]
-    [SerializeField] private TMP_Text expRewardText;  // "+ 10 EXP"
+    [Header("Complete")]
+    [SerializeField] private GameObject checkMarkImage;
 
     [Header("DOTween Settings")]
     [SerializeField] private float claimScaleDuration = 0.2f;
@@ -40,19 +40,24 @@ public class QuestUIController : MonoBehaviour
     {
         claimButton.onClick.AddListener(OnClaimButtonClicked);
         _questManager.OnQuestChanged += Refresh;
+        _questManager.OnQuestClaimable += RefreshClaimable;
+        _questManager.OnProgressChanged += RefreshProgress;
 
-        // 초기 상태 반영
         Refresh(_questManager.CurrentQuest);
     }
 
     private void OnDestroy()
     {
         if (_questManager != null)
+        {
             _questManager.OnQuestChanged -= Refresh;
-
+            _questManager.OnQuestClaimable -= RefreshClaimable;
+            _questManager.OnProgressChanged -= RefreshProgress;
+        }
         claimButton.onClick.RemoveListener(OnClaimButtonClicked);
     }
 
+    // 퀘스트 전환 시 전체 갱신
     private void Refresh(QuestInstance quest)
     {
         if (quest == null)
@@ -62,22 +67,37 @@ public class QuestUIController : MonoBehaviour
         }
 
         panelRoot.SetActive(true);
+        checkMarkImage.SetActive(false);
+        claimButton.interactable = false;
 
         titleText.text = quest.Data.Title;
         progressText.text = $"{quest.CurrentValue} / {quest.TargetValue}";
-        progressBar.value = (float)quest.CurrentValue / quest.TargetValue;
 
-        // 보상 EXP 표시
         if (quest.Data.Reward is ExpReward expReward)
-            expRewardText.text = $"+ {expReward.ExpAmount} EXP";
+            expRewardText.text = $"보상: {expReward.ExpAmount} EXP";
         else
             expRewardText.text = string.Empty;
+    }
 
-        // Claimable 상태일 때 버튼 활성화
-        claimButton.interactable = quest.State == QuestState.Claimable;
+    // Claimable 상태 전환 시
+    private void RefreshClaimable(QuestInstance quest)
+    {
+        if (quest == null) return;
 
-        if (quest.State == QuestState.Claimable)
-            PlayClaimableEffect();
+        progressText.text = $"{quest.CurrentValue} / {quest.TargetValue}";
+        claimButton.interactable = true;
+        checkMarkImage.SetActive(true);
+
+        panelRoot.transform
+            .DOShakePosition(shakeDuration, shakeStrength)
+            .SetUpdate(true);
+    }
+
+    // 진행도만 갱신
+    private void RefreshProgress(QuestInstance quest)
+    {
+        if (quest == null) return;
+        progressText.text = $"{quest.CurrentValue} / {quest.TargetValue}";
     }
 
     private void OnClaimButtonClicked()
@@ -87,19 +107,11 @@ public class QuestUIController : MonoBehaviour
 
         PlayClaimAnimation(() =>
         {
+            checkMarkImage.SetActive(false);
             _questManager.ClaimCurrentQuest();
         });
     }
 
-    // 완료 조건 달성 시 패널 흔들림 연출
-    private void PlayClaimableEffect()
-    {
-        panelRoot.transform
-            .DOShakePosition(shakeDuration, shakeStrength)
-            .SetUpdate(true);
-    }
-
-    // 수령 클릭 시 축소 → 확대 후 콜백
     private void PlayClaimAnimation(System.Action onComplete)
     {
         panelRoot.transform

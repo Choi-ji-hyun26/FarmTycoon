@@ -26,11 +26,10 @@ public class QuestArrowRegistry : MonoBehaviour
     {
         if (string.IsNullOrEmpty(id)) return;
 
-        if (!_registry.ContainsKey(id))
-            _registry.Add(id, target);
-        else
+        if (_registry.ContainsKey(id))
             Debug.LogWarning($"QuestArrowRegistry: '{id}' 이미 등록됨. 덮어씁니다.");
-            _registry[id] = target;
+
+        _registry[id] = target;
     }
 
     public void Unregister(string id)

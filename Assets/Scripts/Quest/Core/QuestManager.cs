@@ -5,21 +5,26 @@ using VContainer.Unity;
 
 /// <summary>
 /// 퀘스트 진행 전체 관리
-/// VContainer로 등록, 싱글톤 x
+/// VContainer로 등록, 싱글톤 아님
 /// 퀘스트 순서대로 1개씩 진행
 /// </summary>
 public class QuestManager : IStartable, System.IDisposable
 {
-    [SerializeField] private List<QuestData> _questDataList;
-
+    private List<QuestData> _questDataList;
     private QuestInstance _currentQuest;
     private int _currentIndex = -1;
 
     public QuestInstance CurrentQuest => _currentQuest;
     public int CurrentIndex => _currentIndex;
 
-    // UI 갱신용 이벤트
+    // 퀘스트 전환 시 (새 퀘스트 시작, 모든 퀘스트 완료)
     public event System.Action<QuestInstance> OnQuestChanged;
+
+    // Claimable 상태 전환 시
+    public event System.Action<QuestInstance> OnQuestClaimable;
+
+    // 진행도 변경 시
+    public event System.Action<QuestInstance> OnProgressChanged;
 
     [Inject]
     public QuestManager(List<QuestData> questDataList)
@@ -27,7 +32,6 @@ public class QuestManager : IStartable, System.IDisposable
         _questDataList = questDataList;
     }
 
-    // IStartable — LifetimeScope 초기화 시 자동 호출
     public void Start()
     {
         StartNextQuest();
@@ -40,6 +44,7 @@ public class QuestManager : IStartable, System.IDisposable
         if (_currentIndex >= _questDataList.Count)
         {
             Debug.Log("QuestManager: 모든 퀘스트 완료");
+            UnsubscribeCurrentQuest();
             _currentQuest = null;
             OnQuestChanged?.Invoke(null);
             return;
@@ -49,7 +54,6 @@ public class QuestManager : IStartable, System.IDisposable
 
         var data = _questDataList[_currentIndex];
 
-        // CustomerServed 퀘스트는 현재 누적 손님 수를 기준값으로 전달
         int baseValue = 0;
         if (data.TargetEvent == QuestEventType.CustomerServed)
             baseValue = CustomerServedCounter.Instance != null
@@ -58,13 +62,14 @@ public class QuestManager : IStartable, System.IDisposable
 
         _currentQuest = new QuestInstance(data, baseValue);
         _currentQuest.OnStateChanged += OnCurrentQuestStateChanged;
+        _currentQuest.OnProgressChanged += OnCurrentQuestProgressChanged;
 
         SubscribeCurrentQuest();
 
+        // 퀘스트 전환 시에만 발행
         OnQuestChanged?.Invoke(_currentQuest);
     }
 
-    // 플레이어가 패널 클릭 시 UI에서 호출
     public void ClaimCurrentQuest()
     {
         if (_currentQuest == null) return;
@@ -77,12 +82,20 @@ public class QuestManager : IStartable, System.IDisposable
     {
         if (_currentQuest == null) return;
 
-        // Claimable 상태 변경은 UI가 OnQuestChanged로 감지
-        OnQuestChanged?.Invoke(_currentQuest);
-
-        // Completed → 즉시 다음 퀘스트
-        if (_currentQuest.State == QuestState.Completed)
+        if (_currentQuest.State == QuestState.Claimable)
+        {
+            // Claimable은 별도 이벤트로 분리 — OnQuestChanged 발행 안 함
+            OnQuestClaimable?.Invoke(_currentQuest);
+        }
+        else if (_currentQuest.State == QuestState.Completed)
+        {
             StartNextQuest();
+        }
+    }
+
+    private void OnCurrentQuestProgressChanged()
+    {
+        OnProgressChanged?.Invoke(_currentQuest);
     }
 
     private void SubscribeCurrentQuest()
@@ -125,6 +138,9 @@ public class QuestManager : IStartable, System.IDisposable
     {
         if (_currentQuest == null) return;
 
+        _currentQuest.OnStateChanged -= OnCurrentQuestStateChanged;
+        _currentQuest.OnProgressChanged -= OnCurrentQuestProgressChanged;
+
         switch (_currentQuest.Data.TargetEvent)
         {
             case QuestEventType.CarrotHarvested:
@@ -157,11 +173,8 @@ public class QuestManager : IStartable, System.IDisposable
         }
     }
 
-    // IDisposable — LifetimeScope 파괴 시 자동 호출
     public void Dispose()
     {
         UnsubscribeCurrentQuest();
-        if (_currentQuest != null)
-            _currentQuest.OnStateChanged -= OnCurrentQuestStateChanged;
     }
 }

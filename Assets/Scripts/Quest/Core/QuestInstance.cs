@@ -14,7 +14,11 @@ public class QuestInstance
     // CustomerServed 퀘스트 시작 시점 기준값
     private int _baseValue;
 
+    // 상태 전환 시 (Active→Claimable, Claimable→Completed)
     public event Action OnStateChanged;
+
+    // 진행도 변경 시 (매 이벤트마다)
+    public event Action OnProgressChanged;
 
     public QuestInstance(QuestData data, int baseValue = 0)
     {
@@ -40,6 +44,7 @@ public class QuestInstance
     {
         if (State != QuestState.Active) return;
         CurrentValue = e.totalCount - _baseValue;
+        OnProgressChanged?.Invoke();
         CheckClaimable();
     }
 
@@ -47,6 +52,7 @@ public class QuestInstance
     {
         if (State != QuestState.Active) return;
         CurrentValue += amount;
+        OnProgressChanged?.Invoke();
         CheckClaimable();
     }
 
