@@ -12,6 +12,7 @@ public class GameLifetimeScope : LifetimeScope
 {
     [SerializeField] private List<QuestData> questDataList;
     [SerializeField] private ExpManager expManager;
+    [SerializeField] private QuestUIController questUIController;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -20,6 +21,9 @@ public class GameLifetimeScope : LifetimeScope
 
         // ExpManager MonoBehaviour 등록
         builder.RegisterComponent(expManager);
+
+        // QuestUIController MonoBehaviour 등록
+        builder.RegisterComponent(questUIController);
 
         // QuestManager 등록 — IStartable, IDisposable 자동 연결
         builder.Register<QuestManager>(Lifetime.Singleton)
