@@ -117,7 +117,8 @@ public class CookingMachineController : MonoBehaviour, IPickupSource, IItemDepos
 
         carrotStack.TryConsume(1);
         soupStack.TryAdd(1);
-        
+
+        EventBus<SoupProducedEvent>.Publish(new SoupProducedEvent { count = 1 });
         Sfx.PlayAtPoint(SoundId.ProductCreate, transform.position);
 
     }
