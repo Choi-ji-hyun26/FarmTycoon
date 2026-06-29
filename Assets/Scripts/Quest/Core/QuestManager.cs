@@ -7,10 +7,13 @@ using VContainer.Unity;
 /// 퀘스트 진행 전체 관리
 /// VContainer로 등록, 싱글톤 아님
 /// 퀘스트 순서대로 1개씩 진행
+/// 이벤트 구독은 QuestProgressTracker에 위임
 /// </summary>
 public class QuestManager : IStartable, System.IDisposable
 {
-    private List<QuestData> _questDataList;
+    private readonly List<QuestData> _questDataList;
+    private readonly QuestProgressTracker _progressTracker;
+
     private QuestInstance _currentQuest;
     private int _currentIndex = -1;
 
@@ -27,11 +30,14 @@ public class QuestManager : IStartable, System.IDisposable
     public event System.Action<QuestInstance> OnProgressChanged;
 
     [Inject]
-    public QuestManager(List<QuestData> questDataList)
+    public QuestManager(List<QuestData> questDataList, QuestProgressTracker progressTracker)
     {
         _questDataList = questDataList;
+        _progressTracker = progressTracker;
     }
 
+    // QuestProgressTracker.Start()가 먼저 실행되도록
+    // VContainer 등록 순서로 보장 (Configure에서 Tracker 먼저 등록)
     public void Start()
     {
         StartNextQuest();
@@ -41,33 +47,28 @@ public class QuestManager : IStartable, System.IDisposable
     {
         _currentIndex++;
 
+        _progressTracker.UnregisterActiveQuest();
+
         if (_currentIndex >= _questDataList.Count)
         {
             Debug.Log("QuestManager: 모든 퀘스트 완료");
-            UnsubscribeCurrentQuest();
             _currentQuest = null;
             OnQuestChanged?.Invoke(null);
             return;
         }
 
-        UnsubscribeCurrentQuest();
-
         var data = _questDataList[_currentIndex];
 
-        int baseValue = 0;
-        if (data.TargetEvent == QuestEventType.CustomerServed)
-            baseValue = CustomerServedCounter.Instance != null
-                ? CustomerServedCounter.Instance.TotalServedCount
-                : 0;
-
-        _currentQuest = new QuestInstance(data, baseValue);
+        _currentQuest = new QuestInstance(data);
         _currentQuest.OnStateChanged += OnCurrentQuestStateChanged;
         _currentQuest.OnProgressChanged += OnCurrentQuestProgressChanged;
 
-        SubscribeCurrentQuest();
-
-        // 퀘스트 전환 시에만 발행
+        // 퀘스트 전환 알림 먼저 (UI 초기화)
         OnQuestChanged?.Invoke(_currentQuest);
+
+        // 트래커에 등록 — 시작 시점 진행도 즉시 계산/통보
+        // 이미 충족된 ACTION 퀘스트는 여기서 바로 Claimable 됨
+        _progressTracker.RegisterActiveQuest(_currentQuest);
     }
 
     public void ClaimCurrentQuest()
@@ -88,6 +89,8 @@ public class QuestManager : IStartable, System.IDisposable
         }
         else if (_currentQuest.State == QuestState.Completed)
         {
+            _currentQuest.OnStateChanged -= OnCurrentQuestStateChanged;
+            _currentQuest.OnProgressChanged -= OnCurrentQuestProgressChanged;
             StartNextQuest();
         }
     }
@@ -97,83 +100,12 @@ public class QuestManager : IStartable, System.IDisposable
         OnProgressChanged?.Invoke(_currentQuest);
     }
 
-    private void SubscribeCurrentQuest()
-    {
-        if (_currentQuest == null) return;
-
-        switch (_currentQuest.Data.TargetEvent)
-        {
-            case QuestEventType.CarrotHarvested:
-                EventBus.Subscribe<CarrotHarvestedEvent>(_currentQuest.OnCarrotHarvested);
-                break;
-            case QuestEventType.SoupProduced:
-                EventBus.Subscribe<SoupProducedEvent>(_currentQuest.OnSoupProduced);
-                break;
-            case QuestEventType.SoupSold:
-                EventBus.Subscribe<SoupSoldEvent>(_currentQuest.OnSoupSold);
-                break;
-            case QuestEventType.MilkSold:
-                EventBus.Subscribe<MilkSoldEvent>(_currentQuest.OnMilkSold);
-                break;
-            case QuestEventType.CustomerServed:
-                EventBus.Subscribe<CustomerServedEvent>(_currentQuest.OnCustomerServed);
-                break;
-            case QuestEventType.ToolUpgraded:
-                EventBus.Subscribe<ToolUpgradedEvent>(_currentQuest.OnToolUpgraded);
-                break;
-            case QuestEventType.FarmerHired:
-                EventBus.Subscribe<FarmerHiredEvent>(_currentQuest.OnFarmerHired);
-                break;
-            case QuestEventType.CourierHired:
-                EventBus.Subscribe<CourierHiredEvent>(_currentQuest.OnCourierHired);
-                break;
-            case QuestEventType.PenExpanded:
-                EventBus.Subscribe<PenExpandedEvent>(_currentQuest.OnPenExpanded);
-                break;
-        }
-    }
-
-    private void UnsubscribeCurrentQuest()
-    {
-        if (_currentQuest == null) return;
-
-        _currentQuest.OnStateChanged -= OnCurrentQuestStateChanged;
-        _currentQuest.OnProgressChanged -= OnCurrentQuestProgressChanged;
-
-        switch (_currentQuest.Data.TargetEvent)
-        {
-            case QuestEventType.CarrotHarvested:
-                EventBus.Unsubscribe<CarrotHarvestedEvent>(_currentQuest.OnCarrotHarvested);
-                break;
-            case QuestEventType.SoupProduced:
-                EventBus.Unsubscribe<SoupProducedEvent>(_currentQuest.OnSoupProduced);
-                break;
-            case QuestEventType.SoupSold:
-                EventBus.Unsubscribe<SoupSoldEvent>(_currentQuest.OnSoupSold);
-                break;
-            case QuestEventType.MilkSold:
-                EventBus.Unsubscribe<MilkSoldEvent>(_currentQuest.OnMilkSold);
-                break;
-            case QuestEventType.CustomerServed:
-                EventBus.Unsubscribe<CustomerServedEvent>(_currentQuest.OnCustomerServed);
-                break;
-            case QuestEventType.ToolUpgraded:
-                EventBus.Unsubscribe<ToolUpgradedEvent>(_currentQuest.OnToolUpgraded);
-                break;
-            case QuestEventType.FarmerHired:
-                EventBus.Unsubscribe<FarmerHiredEvent>(_currentQuest.OnFarmerHired);
-                break;
-            case QuestEventType.CourierHired:
-                EventBus.Unsubscribe<CourierHiredEvent>(_currentQuest.OnCourierHired);
-                break;
-            case QuestEventType.PenExpanded:
-                EventBus.Unsubscribe<PenExpandedEvent>(_currentQuest.OnPenExpanded);
-                break;
-        }
-    }
-
     public void Dispose()
     {
-        UnsubscribeCurrentQuest();
+        if (_currentQuest != null)
+        {
+            _currentQuest.OnStateChanged -= OnCurrentQuestStateChanged;
+            _currentQuest.OnProgressChanged -= OnCurrentQuestProgressChanged;
+        }
     }
 }

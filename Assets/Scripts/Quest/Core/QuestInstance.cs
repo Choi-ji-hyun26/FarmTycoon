@@ -2,7 +2,8 @@ using System;
 
 /// <summary>
 /// 퀘스트 런타임 상태
-/// QuestData를 기반으로 생성되며 진행도/상태를 관리
+/// 이벤트를 직접 구독하지 않고 QuestProgressTracker로부터 진행도를 갱신받음
+/// 진행도/상태 계산만 책임 (단일 책임)
 /// </summary>
 public class QuestInstance
 {
@@ -11,59 +12,43 @@ public class QuestInstance
     public int TargetValue { get; private set; }
     public QuestState State { get; private set; }
 
-    // CustomerServed 퀘스트 시작 시점 기준값
-    private int _baseValue;
-
     // 상태 전환 시 (Active→Claimable, Claimable→Completed)
     public event Action OnStateChanged;
 
-    // 진행도 변경 시 (매 이벤트마다)
+    // 진행도 변경 시
     public event Action OnProgressChanged;
 
-    public QuestInstance(QuestData data, int baseValue = 0)
+    public QuestInstance(QuestData data)
     {
         Data = data;
         TargetValue = data.TargetValue;
         CurrentValue = 0;
         State = QuestState.Active;
-        _baseValue = baseValue;
     }
 
-    // EventBus 콜백 — 이벤트 타입별 처리
-    public void OnCarrotHarvested(CarrotHarvestedEvent e)  => Accumulate(e.count);
-    public void OnSoupProduced(SoupProducedEvent e)        => Accumulate(e.count);
-    public void OnSoupSold(SoupSoldEvent e)                => Accumulate(e.count);
-    public void OnMilkSold(MilkSoldEvent e)                => Accumulate(e.count);
-    public void OnToolUpgraded(ToolUpgradedEvent e)        => Accumulate(1);
-    public void OnFarmerHired(FarmerHiredEvent e)          => Accumulate(1);
-    public void OnCourierHired(CourierHiredEvent e)        => Accumulate(1);
-    public void OnPenExpanded(PenExpandedEvent e)          => Accumulate(1);
-
-    // CustomerServed는 누적값 기반 — 퀘스트 시작 이전 손님 수 제외
-    public void OnCustomerServed(CustomerServedEvent e)
+    /// <summary>
+    /// QuestProgressTracker가 현재 진행도를 전달
+    /// COUNT: 퀘스트 시작 이후 누적분, ACTION: 절대 완료 횟수
+    /// 이미 baseValue가 차감된 값이 들어옴
+    /// </summary>
+    public void UpdateProgress(int newValue)
     {
         if (State != QuestState.Active) return;
-        CurrentValue = e.totalCount - _baseValue;
+
+        int clamped = newValue;
+        if (clamped > TargetValue)
+            clamped = TargetValue;
+
+        if (clamped == CurrentValue) return;
+
+        CurrentValue = clamped;
         OnProgressChanged?.Invoke();
-        CheckClaimable();
-    }
 
-    private void Accumulate(int amount)
-    {
-        if (State != QuestState.Active) return;
-        CurrentValue += amount;
-        OnProgressChanged?.Invoke();
-        CheckClaimable();
-    }
-
-    private void CheckClaimable()
-    {
-        if (State != QuestState.Active) return;
-        if (CurrentValue < TargetValue) return;
-
-        CurrentValue = TargetValue; // 초과 방지
-        State = QuestState.Claimable;
-        OnStateChanged?.Invoke();
+        if (CurrentValue >= TargetValue)
+        {
+            State = QuestState.Claimable;
+            OnStateChanged?.Invoke();
+        }
     }
 
     // 플레이어가 패널 클릭 시 호출

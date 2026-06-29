@@ -17,6 +17,7 @@ public class PenExpansionController : MonoBehaviour, IMoneyDepositTarget
     [SerializeField] private CustomerDeskQueueManager customerDeskQueueManager;
 
     [Header("Upgrade Settings")]
+    [SerializeField] private PenExpansionStage expansionStage = PenExpansionStage.First;
     [SerializeField] private int requiredCost = 50;
     [SerializeField] private int slotCountToUnlock = 5;
     [SerializeField] private float completeDelay = 0.3f;
@@ -59,7 +60,7 @@ public class PenExpansionController : MonoBehaviour, IMoneyDepositTarget
 
         penSlotController.UnlockSlots(slotCountToUnlock);
 
-        EventBus.Publish(new PenExpandedEvent());
+        EventBus.Publish(new PenExpandedEvent { stage = expansionStage });
 
         if (penCollectionBox != null && expandedMilkCapacity > 0)
             penCollectionBox.ExpandCapacity(expandedMilkCapacity);

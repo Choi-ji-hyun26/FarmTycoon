@@ -5,7 +5,7 @@ using VContainer.Unity;
 
 /// <summary>
 /// VContainer LifetimeScope
-/// 씬에 빈 GameObject로 배치, QuestManager 등록
+/// 씬에 빈 GameObject로 배치, 퀘스트 시스템 의존성 등록
 /// Inspector에서 QuestData 리스트 순서대로 등록
 /// </summary>
 public class GameLifetimeScope : LifetimeScope
@@ -21,6 +21,11 @@ public class GameLifetimeScope : LifetimeScope
         builder.RegisterComponent(expManager);
         builder.RegisterComponent(questUIController);
         builder.RegisterComponent(questArrowDirector);
+
+        // QuestProgressTracker를 먼저 등록 — IStartable 실행 순서상 우선
+        builder.Register<QuestProgressTracker>(Lifetime.Singleton)
+               .AsImplementedInterfaces()
+               .AsSelf();
 
         builder.Register<QuestManager>(Lifetime.Singleton)
                .AsImplementedInterfaces()
