@@ -110,10 +110,8 @@ public class QuestUIController : MonoBehaviour
         if (_questManager.CurrentQuest == null) return;
         if (_questManager.CurrentQuest.State != QuestState.Claimable) return;
 
-        // 보상 금액을 클릭 시점에 확보 (Claim 후 퀘스트가 전환되므로)
-        int expAmount = 0;
-        if (_questManager.CurrentQuest.Data.Reward is ExpReward expReward)
-            expAmount = expReward.ExpAmount;
+        // 보상이 EXP인지 클릭 시점에 확인 (Claim 후 퀘스트가 전환되므로)
+        bool hasExpReward = _questManager.CurrentQuest.Data.Reward is ExpReward;
 
         PlayClaimAnimation(() =>
         {
@@ -124,9 +122,9 @@ public class QuestUIController : MonoBehaviour
             // 데이터 먼저 갱신 (ExpManager.AddExp)
             _questManager.ClaimCurrentQuest();
 
-            // 그 다음 EXP 이동 연출 시작
-            if (expAmount > 0)
-                _levelUIController.PlayExpGainEffect(expEffectOrigin, expAmount);
+            // 그 다음 별 아이콘 이동 연출 시작
+            if (hasExpReward)
+                _levelUIController.PlayExpGainEffect(expEffectOrigin);
         });
     }
 
