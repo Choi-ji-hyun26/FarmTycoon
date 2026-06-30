@@ -8,5 +8,6 @@ public enum SoundId
     MoneyPickup,        // 돈 줍기
     MoneySpend,         // 돈 지불
     ZoneUnlock,          // 해금
-    Ending               // 엔딩
+    Ending,              // 엔딩
+    QuestComplete        // 퀘스트 완료 클릭
 }

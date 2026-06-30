@@ -119,6 +119,8 @@ public class QuestUIController : MonoBehaviour
         {
             checkMarkImage.SetActive(false);
 
+            Sfx.Play(SoundId.QuestComplete);
+
             // 데이터 먼저 갱신 (ExpManager.AddExp)
             _questManager.ClaimCurrentQuest();
 
