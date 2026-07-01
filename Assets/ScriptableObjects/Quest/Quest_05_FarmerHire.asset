@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b579a85796cc04d72b3839ceaa803b25, type: 3}
+  m_Name: Quest_05_FarmerHire
+  m_EditorClassIdentifier: 
+  questId: 
+  title: "\uB18D\uBD80 \uACE0\uC6A9\uD558\uAE30"
+  targetEvent: 6
+  targetValue: 1
+  reward: {fileID: 11400000, guid: af07b68482291497ca881f2156abe91f, type: 2}
+  arrowTargetId: 

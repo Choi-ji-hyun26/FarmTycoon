@@ -70,13 +70,19 @@ public class SaleDeskController : MonoBehaviour
         {
             if(!soupStack.IsEmpty)
                 if(soupStack.TryConsume(1))
+                {
                     targetCustomer.TryReceiveProduct(1);
+                    EventBus.Publish(new SoupSoldEvent { count = 1 });
+                }
         }
         else if (targetCustomer.RequestType == CustomerRequestType.Milk)
         {
             if (!milkStack.IsEmpty)
                 if (milkStack.TryConsume(1))
+                {
                     targetCustomer.TryReceiveProduct(1);
+                    EventBus.Publish(new MilkSoldEvent { count = 1 });
+                }
         }
     }
 
