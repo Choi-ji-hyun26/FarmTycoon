@@ -147,7 +147,7 @@ else // ACTION — "몇 번" 대신 "완료 여부"
 ## 링크
 
 YouTube 게임 소개 영상
-https://youtu.be/TWybSNSr_Ho
+https://youtu.be/3d_a376TS3c
 
 ---
 
