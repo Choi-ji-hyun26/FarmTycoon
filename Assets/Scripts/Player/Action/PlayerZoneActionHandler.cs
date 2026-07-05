@@ -72,6 +72,7 @@ public class PlayerZoneActionHandler : MonoBehaviour
         {
             pickupTimer       = 0f;
             depositTimer      = 0f;
+            moneyPickupTimer  = 0f;
             moneyDepositTimer = 0f;
             lastZoneType      = zone.zoneType;
         }
