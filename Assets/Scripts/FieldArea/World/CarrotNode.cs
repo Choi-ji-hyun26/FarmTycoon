@@ -65,7 +65,7 @@ public class CarrotNode : MonoBehaviour
         return true;
     }
 
-    // 현재 farmerRk 이 당근을 점유하고 있다면 claim을 해제
+    // 현재 farmer 이 당근을 점유하고 있다면 claim을 해제
     public void ReleaseClaim(FarmerWorker farmer)
     {
         if (currentFarmer == farmer)
